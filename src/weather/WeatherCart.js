@@ -2,44 +2,36 @@ import React, { useEffect, useState,useMemo } from "react";
 import sunset from "../png/sunsetnew.png";
 import sunrise from "../png/sunrise.png";
 import cities from "./Cities.json";
+import { fetchweatherdata } from "../Slices/WeatherSlice";
 import { useDispatch,useSelector } from "react-redux";
+import { STATUSES } from "../Slices/WeatherSlice";
+
+
 const WeatherCart = () => {
-  const [data, setdata] = useState();
   const [weatheData, setweatheData] = useState([]);
   const [citiesData, setCitiesData] = useState();
+  const [Lat, setLat] = useState();
+  const [Lon, setLon] = useState();
   const dispatch = useDispatch();
-  const {data:tshirtlists,status} = useSelector((state) => state.tshirtlist);
+  const {data:weatherstoredata,status} = useSelector((state) => state.weatherstoredata);
 
-  const getAllData = async (lat,lon) => {
-    console.log(lat,lon,"ggggeeeeetttttt")
-    try {
-      const res = await fetch(
-        `https://fcc-weather-api.glitch.me/api/current?lat=${lat}&lon=${lon}`,
-        {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const itemdata = await res.json();
-
-      if (itemdata) {
-        setdata(itemdata);
-      }
-    } catch (error) {
-      console.error("Error adding data: ", error);
-    }
-  };
   useEffect(() => {
     setCitiesData(cities);
+    
   }, []);
 
-
+  useEffect(() => {
+    if (weatherstoredata) {
+      setweatheData([...weatheData, weatherstoredata]);
+    }
+  }, [weatherstoredata]);
+  
   const addCity = () => {
-    getAllData();
-    setweatheData([...weatheData, data]);
+    const obj ={
+    lat:Lat,
+    lon:Lon
+    }
+    dispatch(fetchweatherdata(obj))
   };
 
   const convertTime = (t) => {
@@ -54,12 +46,19 @@ const WeatherCart = () => {
     const ab = citiesData.filter((item) => {
       return item.name === e.target.value;
     });
-    console.log(ab[0].lat)
-    const g = await getAllData(ab[0].lat,ab[0].lon)
-    setweatheData([...weatheData, data]);
-    
+ 
+    setLat(ab[0].lat)
+    setLon(ab[0].lon)  
   };
-    console.log(weatheData,"aaaaaaaaaaaassssssss")
+    
+    if (status === STATUSES.LOADING) {
+        return "Loading"
+        
+          }
+          if (status === STATUSES.ERROR) {
+            return <h2>something went wrong..!</h2>;
+          }
+console.log(weatheData,)
   return (
     <div className=" text-gray-500">
       <header className="text-gray-600 body-font bg-violet-500 mb-2">
@@ -82,8 +81,7 @@ const WeatherCart = () => {
 
       
       <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-6 p-3  bg-white">
-      {weatheData &&
-        weatheData.map((item) => {
+      {weatheData && weatheData.map((item) => {
           return (
                 <div className="w-full border bg-gray-200 p-5 rounded-lg">
                   <div className="flex justify-between items-center">

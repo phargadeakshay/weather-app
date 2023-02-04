@@ -1,15 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import weatherdat from "../slice/TshirtListSlice";
+import WeatherSlice from "../Slices/WeatherSlice";
 
 const store = configureStore({
     reducer: {
-    //   product: productReducer,
-         tshirtlist:TshirtListSlice,
-     //     product:ProductSlice,
-         productdetails:ProductDetailsSlice,
-         savetocart:SaveToCartSlice,
-         cartdata:CartSlice,
-         loginslicedata:LoginSlice
+       weatherstoredata :WeatherSlice
  
     },
   });

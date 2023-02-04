@@ -31,9 +31,9 @@ const WeatherStore = createSlice({
 
 export const fetchweatherdata = createAsyncThunk(
   "weatherdata/fetch",
-  async (lat,lon) => {
-
-    const res = await fetch(`https://fcc-weather-api.glitch.me/api/current?lat=${lat}&lon=${lon}`, {
+  async (obj) => {
+    console.log(obj.lat,obj.lon,"dddddddddd9999999999999999999999999999999dd")
+    const res = await fetch(`https://fcc-weather-api.glitch.me/api/current?lat=${obj.lat}&lon=${obj.lon}`, {
       method:"GET",
       mode: "cors",
       headers: {
@@ -49,4 +49,3 @@ export const fetchweatherdata = createAsyncThunk(
 
 export const {} = WeatherStore.actions;
 export default WeatherStore.reducer;
-
