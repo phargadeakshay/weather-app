@@ -35,7 +35,7 @@ const WeatherCart = () => {
         feels_like: weatherstoredata.main.feels_like,
         sunrise: weatherstoredata.sys.sunrise,
         sunset: weatherstoredata.sys.sunset,
-        // feels_like:weatherstoredata.main.feels_like,
+        id:weatherstoredata.id,
       };
       setweatheData([...weatheData, newdata]);
     //   setweatheData(...new Set(weatheData))
@@ -83,19 +83,26 @@ const WeatherCart = () => {
 //   }, [LatandLon]);
 
 
-useEffect(() => {
-    const intervalId = setInterval(() => {
-        setweatheData([])
-      LatandLon.forEach(({ lat, lon }) => {
-        const obj ={lat:lat,lon:lon}
-        dispatch(fetchweatherdata(obj))
-      });
-    }, 10000);
-    // setweatheData([])
-    // return () => clearInterval(intervalId);
-}, [LatandLon]);
+// useEffect(() => {
+//     const intervalId = setInterval(() => {
+//         setweatheData([])
+//       LatandLon.forEach(({ lat, lon }) => {
+//         const obj ={lat:lat,lon:lon}
+//         dispatch(fetchweatherdata(obj))
+//       });
+//     }, 10000);
+//     // setweatheData([])
+//     // return () => clearInterval(intervalId);
+// }, [LatandLon]);
 
-
+const DeleteCity=(id)=>{
+let filt = weatheData.filter((item)=>{
+    return(
+      item.id !==  id 
+    )
+})
+setweatheData(filt)
+}
 
 
 
@@ -123,32 +130,29 @@ useEffect(() => {
   console.log(weatheData);
   return (
     <div className=" text-gray-500">
-      <header className="text-gray-600 body-font bg-violet-500 mb-2">
-        <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-          <select onChange={SelectedCity}>
+      <header className="text-gray-600 body-font bg-yellow-500 mb-2">
+        <div className="container  flex flex-wrap p-2 flex-col md:flex-row items-center">
+          <select onChange={SelectedCity} className="w-56 h-10 rounded-lg">
             <option value="">Select City</option>
             {citiesData &&
               citiesData.map((city) => {
                 return <option value={city.name}>{city.name}</option>;
               })}
           </select>
-          <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-            <button className="mr-5 hover:text-gray-900" onClick={addCity}>
-              First Link
+            <button className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white" onClick={addCity}>
+              Add City
             </button>
-            <a className="mr-5 hover:text-gray-900">Second Link</a>
-          </nav>
         </div>
       </header>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-6 p-3  bg-white">
+<hr className="text-yellow-400 border-2"/>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:gap-20 p-3  bg-white">
         {weatheData &&
           weatheData.map((item) => {
             return (
               <div className="w-full border bg-gray-200 p-5 rounded-lg">
                 <div className="flex justify-between items-center">
                   <p className="text-xl font-bold text-gray-500">{item.name}</p>
-                  <i className="far fa-trash-alt add-btn text-red-600"></i>
+                  <i className="far fa-trash-alt add-btn text-red-600 text-2xl" onClick={()=>{DeleteCity(item.id)}}></i>
                 </div>
                 <hr className=" border-1 mt-2 border-yellow-400" />
                 <div className="w-full mt-2 flex justify-end">
