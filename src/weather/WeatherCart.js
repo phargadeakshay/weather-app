@@ -3,7 +3,7 @@ import sunset from "../png/sunsetnew.png";
 import cloudy from "../png/cloudy1.png";
 // import sunset2 from "../png/sunset2.png";
 import sunset2 from "../png/sunset6.jpg";
-
+import images from "../png/images.png";
 import sunrise from "../png/sunrise.png";
 import sunrise3 from "../png/sunrise3.jpg";
 import cities from "./Cities.json";
@@ -41,10 +41,10 @@ const WeatherCart = () => {
         feels_like: weatherstoredata.main.feels_like,
         sunrise: weatherstoredata.sys.sunrise,
         sunset: weatherstoredata.sys.sunset,
-        id:weatherstoredata.id,
+        id: weatherstoredata.id,
       };
       setweatheData([...weatheData, newdata]);
-    //   setweatheData(...new Set(weatheData))
+      //   setweatheData(...new Set(weatheData))
     }
   }, [weatherstoredata]);
 
@@ -53,7 +53,15 @@ const WeatherCart = () => {
       lat: Lat,
       lon: Lon,
     };
+    if (!obj.lat || obj.lat === undefined || obj.lat === null){
+    console.log(obj,"ddddddddddddddddddd")
+   
+  }else{
+    setLatandLon([...LatandLon,obj])
     dispatch(fetchweatherdata(obj));
+    setLat()
+    setLon()
+  }
   };
 
   const convertTime = (t) => {
@@ -73,28 +81,26 @@ const WeatherCart = () => {
     setLon(ab[0].lon);
   };
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+        setweatheData([]); // reset the weather data here
+        LatandLon.forEach(({ lat, lon }) => {
+          const obj ={lat:lat,lon:lon}
+          dispatch(fetchweatherdata(obj))
+        });
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [LatandLon]);
 
-
-// useEffect(() => {
-//   const intervalId = setInterval(() => {
-//       setweatheData([]); // reset the weather data here
-//       LatandLon.forEach(({ lat, lon }) => {
-//         const obj ={lat:lat,lon:lon}
-//         dispatch(fetchweatherdata(obj))
-//       });
-//   }, 10000);
-//   return () => clearInterval(intervalId);
-// }, [LatandLon]);
-
-
-const DeleteCity=(id)=>{
-let filt = weatheData.filter((item)=>{
-    return(
-      item.id !==  id 
-    )
-})
-setweatheData(filt)
-}
+  const DeleteCity = (id) => {
+    let filt = weatheData.filter((item) => {
+      return item.id !== id;
+    });
+    setweatheData(filt);
+  };
+  const RomveAllCity = () => {
+  setweatheData([])
+  };
 
   if (status === STATUSES.LOADING) {
     return (
@@ -108,9 +114,15 @@ setweatheData(filt)
   }
   console.log(weatheData);
   return (
-    <div className=" text-gray-500">
-      <header className="text-gray-600 body-font bg-yellow-500 mb-2">
+    <div className=" text-gray-500 bg-gray-200">
+      <header className="text-gray-600 body-font bg-violet-600 ">
         <div className="container  flex flex-wrap p-2 flex-col md:flex-row items-center">
+          <div className="flex mx-5 items-center px-4  bg-slate-200 rounded-md">
+            <span className="mx-2 p-2  text-2xl font-semibold">
+              Weather-App
+            </span>
+            <img src={images} className="w-9 h-9" alt="" />
+          </div>
           <select onChange={SelectedCity} className="w-56 h-10 rounded-lg">
             <option value="">Select City</option>
             {citiesData &&
@@ -118,41 +130,75 @@ setweatheData(filt)
                 return <option value={city.name}>{city.name}</option>;
               })}
           </select>
-            <button className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white" onClick={addCity}>
-              Add City
-            </button>
+          <button
+            className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white"
+            onClick={addCity}
+          >
+            Add City
+          </button>
+          <button
+            className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white"
+            onClick={RomveAllCity}
+          >
+            Clear All
+          </button>
         </div>
       </header>
-<hr className="text-yellow-400 border-2 "/>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-10 p-3  bg-white">
+      {/* <hr className="text-yellow-400 border-2 " /> */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-10 p-3  text-regal-text">
         {weatheData &&
           weatheData.map((item) => {
             return (
-              <div className="w-full border border-black bg-yellow-100 p-5 rounded-lg h-[380px]">
+              <div className="w-full border border-black  p-5 rounded-lg h-[380px] bg-regal-white1">
                 <div className="flex justify-between items-center">
                   <p className="text-xl font-bold text-gray-500">{item.name}</p>
-                  <i className="far fa-trash-alt add-btn text-red-600 text-2xl" onClick={()=>{DeleteCity(item.id)}}></i>
+                  <i
+                    className="far fa-trash-alt add-btn text-red-600 text-2xl"
+                    onClick={() => {
+                      DeleteCity(item.id);
+                    }}
+                  ></i>
                 </div>
                 <hr className=" border-1 mt-2 border-red-600" />
-                <div className="w-full mt-2 flex justify-end">
-                  <img src={cloudy} alt="" className="w-[70px] h-[70px] rounded-md" />
+                <div className="w-full mt-2 flex justify-between items-center">
+                <span className="font-bold text-gray-500 text-2xl">
+                      {new Date(item.sunrise * 1000).toLocaleDateString()}
+                    </span>
+                  <img
+                    src={cloudy}
+                    alt=""
+                    className="w-[70px] h-[70px] rounded-md"
+                  />
                 </div>
                 <div className="rounded overflow-hidden  flex justify-center flex-col items-center">
-                  <span alt="ecommerce" className="text-yellow-600 text-8xl font-semibold">
+                  <span
+                    alt="ecommerce"
+                    className="text-yellow-600 text-8xl font-semibold"
+                  >
                     {item.temp.toFixed(0)}
                     <sup>'</sup>C
                   </span>
-                  <p className="font-bold text-gray-500">Feels like:{item.feels_like}</p>
+                  <p className="font-bold text-gray-500">
+                    Feels like:{item.feels_like}
+                  </p>
                 </div>
                 <div className="flex justify-around mt-3 w-full">
                   <div className="flex flex-col items-center ">
-                    <img src={sunrise3} alt="" className="w-13 rounded-md h-12" />
+                    <img
+                      src={sunrise3}
+                      alt=""
+                      className="w-13 rounded-md h-12"
+                    />
                     <span className="font-bold text-gray-500">
                       {new Date(item.sunrise * 1000).toLocaleTimeString()}
                     </span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <img src={sunset2} alt="" className="w-13 rounded-md h-12" />
+                    <img
+                      src={sunset2}
+                      alt=""
+                      className="w-13 rounded-md h-12"
+                    />
                     <span className="font-bold text-gray-500">
                       {convertTime(item.sunset)}
                     </span>
