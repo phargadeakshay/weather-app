@@ -42,6 +42,7 @@ const WeatherCart = () => {
         sunrise: weatherstoredata.sys.sunrise,
         sunset: weatherstoredata.sys.sunset,
         id: weatherstoredata.id,
+        icon:weatherstoredata.weather[0].icon
       };
       setweatheData([...weatheData, newdata]);
       //   setweatheData(...new Set(weatheData))
@@ -53,10 +54,17 @@ const WeatherCart = () => {
       lat: Lat,
       lon: Lon,
     };
+
+    let checkDuplicateCity =LatandLon.filter((item)=>item.lat ===Lat && item.lon===Lon) 
     if (!obj.lat || obj.lat === undefined || obj.lat === null){
     console.log(obj,"ddddddddddddddddddd")
     Swal.fire('You Have Not Selected Any City')
-  }else{
+
+
+  }else if(checkDuplicateCity.length !==0){
+    Swal.fire('You Try to Add Duplicate City')
+  }
+  else{
     setLatandLon([...LatandLon,obj])
     dispatch(fetchweatherdata(obj));
     setLat()
@@ -119,16 +127,16 @@ const WeatherCart = () => {
   }
   console.log(weatheData);
   return (
-    <div className=" text-gray-500 bg-gray-200 min-h-screen">
+    <div className=" text-gray-500 bg-gray-200 min-h-screen bg-gradient-to-r from-purple-500 to-pink-500">
       <header className="text-gray-600 body-font bg-violet-600 ">
-        <div className="container  flex flex-wrap p-2 flex-col md:flex-row items-center">
-          <div className="flex mx-5 items-center px-4  bg-slate-200 rounded-md">
-            <span className="mx-2 p-2  text-2xl font-semibold">
+        <div className="container  flex flex-wrap p-2 flex-row items-center">
+          <div className="flex mx-2 md:mx-5 items-center md:px-4  bg-slate-200 rounded-md">
+            <span className="mx-2 p-2  md:text-2xl font-semibold">
               Weather-App
             </span>
             <img src={images} className="w-9 h-9" alt="" />
           </div>
-          <select onChange={SelectedCity} className="w-56 h-10 rounded-lg">
+          <select onChange={SelectedCity} className="w-36 h-10 md:w-56 md:h-10 rounded-lg ">
             <option value="">Select City</option>
             {citiesData &&
               citiesData.map((city) => {
@@ -136,13 +144,13 @@ const WeatherCart = () => {
               })}
           </select>
           <button
-            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 pl-4 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800"
+            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 px-2 md:px-4 mx-2 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-pink-700"
             onClick={addCity}
           >
             Add City
           </button>
           <button
-            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 pl-4 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800"
+            className="mr-5 lg:ml-5 hover:text-gray-900 px-2 md:px-4  h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-pink-700"
             onClick={RomveAllCity}
           >
             Clear All
@@ -150,11 +158,11 @@ const WeatherCart = () => {
         </div>
       </header>
       {/* <hr className="text-yellow-400 border-2 " /> */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-10 p-3  text-regal-text">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 2xl:grid-cols-4  lg:grid-cols-3 lg:gap-10 p-3  text-regal-text w-full items-center justify-center">
        {isData ? ( weatheData &&
           weatheData.map((item) => {
             return (
-              <div className="w-full border border-black  p-5 rounded-lg h-[380px] bg-regal-white1">
+              <div className="container mx-auto md:w-4/6 w-3/6 border border-black  p-5 rounded-lg h-[380px] bg-regal-white1 shadow-2xl shadow-black">
                 <div className="flex justify-between items-center">
                   <p className="text-xl font-bold text-gray-500">{item.name}</p>
                   <i
@@ -170,7 +178,7 @@ const WeatherCart = () => {
                       {new Date(item.sunrise * 1000).toLocaleDateString()}
                     </span>
                   <img
-                    src={cloudy}
+                    src={item.icon}
                     alt=""
                     className="w-[70px] h-[70px] rounded-md"
                   />
@@ -211,13 +219,13 @@ const WeatherCart = () => {
                 </div>
               </div>
             );
-          })):( <div className="md:col-start-2 md:col-end-4 md:col-span-2">
+          })):( <div className="md:col-start-2 md:col-end-3 2xl:col-end-4 md:col-span-2 text-white font-semibold">
 
 <div className='flex flex-col items-center h-96 justify-center gap-5'>
           <span role="img" className='text-5xl'>💻</span>
           <h2 className='text-2xl font-bold'>Missing Card items?</h2>
           <p className='text-lg'>Select City to see the items you added</p>
-          <span className="w-36 px-8 py-2 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800" to="">Thank You</span>
+          <span className="w-36 px-8 py-2 text-center text-white bg-pink-500 rounded-md shadow border hover:bg-gray-800" to="">Thank You</span>
       </div>
           </div>)}
       </div>
