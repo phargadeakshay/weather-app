@@ -11,12 +11,12 @@ import { fetchweatherdata } from "../Slices/WeatherSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { STATUSES } from "../Slices/WeatherSlice";
 import Loading from "react-loading";
-
-
+import Swal from "sweetalert2";
 const WeatherCart = () => {
   const [weatheData, setweatheData] = useState([]);
   const [citiesData, setCitiesData] = useState();
   const [Lat, setLat] = useState();
+  const [isData, setIsData] = useState(false);
   const [Lon, setLon] = useState();
   const dispatch = useDispatch();
   const [LatandLon, setLatandLon] = useState([
@@ -55,12 +55,13 @@ const WeatherCart = () => {
     };
     if (!obj.lat || obj.lat === undefined || obj.lat === null){
     console.log(obj,"ddddddddddddddddddd")
-   
+    Swal.fire('You Have Not Selected Any City')
   }else{
     setLatandLon([...LatandLon,obj])
     dispatch(fetchweatherdata(obj));
     setLat()
     setLon()
+    setIsData(true)
   }
   };
 
@@ -97,9 +98,13 @@ const WeatherCart = () => {
       return item.id !== id;
     });
     setweatheData(filt);
+    if(filt.length <=0){
+      setIsData(false)
+    }
   };
   const RomveAllCity = () => {
   setweatheData([])
+  setIsData(false)
   };
 
   if (status === STATUSES.LOADING) {
@@ -114,7 +119,7 @@ const WeatherCart = () => {
   }
   console.log(weatheData);
   return (
-    <div className=" text-gray-500 bg-gray-200">
+    <div className=" text-gray-500 bg-gray-200 min-h-screen">
       <header className="text-gray-600 body-font bg-violet-600 ">
         <div className="container  flex flex-wrap p-2 flex-col md:flex-row items-center">
           <div className="flex mx-5 items-center px-4  bg-slate-200 rounded-md">
@@ -131,13 +136,13 @@ const WeatherCart = () => {
               })}
           </select>
           <button
-            className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white"
+            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 pl-4 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800"
             onClick={addCity}
           >
             Add City
           </button>
           <button
-            className="mr-5 lg:ml-5 hover:text-gray-900 bg-yellow-700 pr-4 pl-4 h-10 rounded-lg text-white"
+            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 pl-4 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800"
             onClick={RomveAllCity}
           >
             Clear All
@@ -146,7 +151,7 @@ const WeatherCart = () => {
       </header>
       {/* <hr className="text-yellow-400 border-2 " /> */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:gap-10 p-3  text-regal-text">
-        {weatheData &&
+       {isData ? ( weatheData &&
           weatheData.map((item) => {
             return (
               <div className="w-full border border-black  p-5 rounded-lg h-[380px] bg-regal-white1">
@@ -206,7 +211,15 @@ const WeatherCart = () => {
                 </div>
               </div>
             );
-          })}
+          })):( <div className="md:col-start-2 md:col-end-4 md:col-span-2">
+
+<div className='flex flex-col items-center h-96 justify-center gap-5'>
+          <span role="img" className='text-5xl'>💻</span>
+          <h2 className='text-2xl font-bold'>Missing Card items?</h2>
+          <p className='text-lg'>Select City to see the items you added</p>
+          <span className="w-36 px-8 py-2 text-center text-white bg-pink-500 rounded-md shadow hover:bg-gray-800" to="">Thank You</span>
+      </div>
+          </div>)}
       </div>
     </div>
   );
