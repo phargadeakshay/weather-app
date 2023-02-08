@@ -12,9 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { STATUSES } from "../Slices/WeatherSlice";
 import Loading from "react-loading";
 import Swal from "sweetalert2";
+import MissingCity from "./MissingCity";
 const WeatherCart = () => {
   const [weatheData, setweatheData] = useState([]);
   const [citiesData, setCitiesData] = useState();
+  const [TempCon, setTempCon] = useState(false);
   const [Lat, setLat] = useState();
   const [isData, setIsData] = useState(false);
   const [Lon, setLon] = useState();
@@ -91,14 +93,14 @@ const WeatherCart = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
+if(LatandLon.length >0 ) {   const intervalId = setInterval(() => {
         setweatheData([]); // reset the weather data here
         LatandLon.forEach(({ lat, lon }) => {
           const obj ={lat:lat,lon:lon}
           dispatch(fetchweatherdata(obj))
         });
-    }, 10000);
-    return () => clearInterval(intervalId);
+    }, 10000)
+    return () => clearInterval(intervalId)};
   }, [LatandLon]);
 
   const DeleteCity = (id) => {
@@ -115,6 +117,16 @@ const WeatherCart = () => {
   setIsData(false)
   };
 
+// const TempCoversion=(temp)=>{
+//   if(Temp){
+//     setTemp(null)
+//   }
+//   else{
+//     setTemp( temp * (9/5) + 32)
+//   }
+// }
+
+console.log(TempCon,"tttttttttttt")
   if (status === STATUSES.LOADING) {
     return (
       <div className="flex justify-center">
@@ -127,7 +139,7 @@ const WeatherCart = () => {
   }
   console.log(weatheData);
   return (
-    <div className=" text-gray-500 bg-gray-200 min-h-screen bg-gradient-to-r from-purple-500 to-pink-500">
+    <div className=" text-gray-500 min-h-screen bg-gradient-to-r from-purple-500 to-pink-500">
       <header className="text-gray-600 body-font bg-violet-600 ">
         <div className="container  flex flex-wrap p-2 flex-row items-center">
           <div className="flex mx-2 md:mx-5 items-center md:px-4  bg-slate-200 rounded-md">
@@ -144,7 +156,7 @@ const WeatherCart = () => {
               })}
           </select>
           <button
-            className="mr-5 lg:ml-5 hover:text-gray-900 pr-4 px-2 md:px-4 mx-2 h-10 text-center text-white bg-pink-500 rounded-md shadow hover:bg-pink-700"
+            className="mr-5 lg:ml-5  pr-4 px-2 md:px-4 mx-2 h-10 text-white bg-pink-500  shadow bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm  py-2.5 text-center "
             onClick={addCity}
           >
             Add City
@@ -162,7 +174,7 @@ const WeatherCart = () => {
        {isData ? ( weatheData &&
           weatheData.map((item) => {
             return (
-              <div className="container mx-auto md:w-4/6 w-3/6 border border-black  p-5 rounded-lg h-[380px] bg-regal-white1 shadow-2xl shadow-black">
+              <div className="container mx-auto md:w-4/6 w-3/6 border border-black  p-5 rounded-lg h-[395px] bg-regal-white1 shadow-2xl shadow-black">
                 <div className="flex justify-between items-center">
                   <p className="text-xl font-bold text-gray-500">{item.name}</p>
                   <i
@@ -188,9 +200,15 @@ const WeatherCart = () => {
                     alt="ecommerce"
                     className="text-yellow-600 text-8xl font-semibold"
                   >
-                    {item.temp.toFixed(0)}
+                    {TempCon ? ( item.temp * (9/5) + 32).toFixed(0) : item.temp.toFixed(0)}
                     <sup>'</sup>C
                   </span>
+                  <button
+            className="mr-5 lg:ml-5  pr-4 px-2 md:px-4 mx-2 h-10 text-white bg-pink-500  shadow bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm  py-2.5 text-center "
+            onClick={()=>setTempCon(!TempCon)}
+          >
+            Temp Conversion
+          </button>
                   <p className="font-bold text-gray-500">
                     Feels like:{item.feels_like}
                   </p>
@@ -219,15 +237,7 @@ const WeatherCart = () => {
                 </div>
               </div>
             );
-          })):( <div className="md:col-start-2 md:col-end-3 2xl:col-end-4 md:col-span-2 text-white font-semibold">
-
-<div className='flex flex-col items-center h-96 justify-center gap-5'>
-          <span role="img" className='text-5xl'>💻</span>
-          <h2 className='text-2xl font-bold'>Missing Card items?</h2>
-          <p className='text-lg'>Select City to see the items you added</p>
-          <span className="w-36 px-8 py-2 text-center text-white bg-pink-500 rounded-md shadow border hover:bg-gray-800" to="">Thank You</span>
-      </div>
-          </div>)}
+          })):(<MissingCity/>)}
       </div>
     </div>
   );
